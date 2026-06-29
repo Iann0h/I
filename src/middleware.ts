@@ -1,25 +1,35 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyAuth } from '@/lib/auth';
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Public routes that don't require authentication
-  const publicRoutes = ['/auth/login', '/auth/register', '/api/auth/login', '/api/auth/register'];
-
+  // Public routes
+  const publicRoutes = ['/auth/login', '/auth/register', '/'];
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('token')?.value;
+  // Protected routes
+  if (pathname.startsWith('/dashboard')) {
+    const token = request.cookies.get('token')?.value;
 
-  if (!token && !pathname.startsWith('/api/auth')) {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
+    if (!token) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
+
+    try {
+      await verifyAuth(token);
+      return NextResponse.next();
+    } catch (error) {
+      return NextResponse.redirect(new URL('/auth/login', request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

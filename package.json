@@ -46,7 +46,6 @@
   "tailwind-merge": "^2.2.2",
   "tailwindcss-animate": "^1.0.7",
   "zustand": "^4.4.1"
-}
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

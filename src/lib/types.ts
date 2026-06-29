@@ -1,40 +1,32 @@
-export interface Product {
+export interface User {
   id: string;
-  sku: string;
+  email: string;
   name: string;
-  description: string | null;
-  price: number;
-  quantity: number;
-  reorderLevel: number;
-  active: boolean;
-  categoryId: string;
-  supplierId: string;
-  warehouseId: string;
+  role: 'USER' | 'ADMIN';
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
 }
 
 export interface Category {
   id: string;
   name: string;
-  description: string | null;
-  active: boolean;
+  description?: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
 }
 
 export interface Supplier {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
-  address: string | null;
-  active: boolean;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
 }
 
 export interface Warehouse {
@@ -42,55 +34,54 @@ export interface Warehouse {
   name: string;
   location: string;
   capacity: number;
-  active: boolean;
+  currentUsage: number;
   createdAt: Date;
   updatedAt: Date;
-  deletedAt: Date | null;
+}
+
+export interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  description?: string;
+  price: number;
+  quantity: number;
+  reorderLevel: number;
+  categoryId?: string;
+  category?: Category;
+  supplierId?: string;
+  supplier?: Supplier;
+  warehouseId?: string;
+  warehouse?: Warehouse;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt?: Date | null;
 }
 
 export interface Order {
   id: string;
   orderNumber: string;
   quantity: number;
-  status: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   totalPrice: number;
-  notes: string | null;
+  status: 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   productId: string;
+  product?: Product;
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
-  completedAt: Date | null;
-  deletedAt: Date | null;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  name: string | null;
-  role: 'ADMIN' | 'MANAGER' | 'USER' | 'VIEWER';
-  active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  completedAt?: Date | null;
+  deletedAt?: Date | null;
 }
 
 export interface AuditLog {
   id: string;
   userId: string;
+  user?: User;
   action: string;
   entity: string;
   entityId: string;
-  changes: Record<string, unknown>;
-  metadata: Record<string, unknown>;
-  createdAt: Date;
-}
-
-export interface StockHistory {
-  id: string;
-  productId: string;
-  oldQuantity: number;
-  newQuantity: number;
-  change: number;
-  reason: string;
+  changes: string;
+  metadata: string;
   createdAt: Date;
 }
 
@@ -104,9 +95,14 @@ export interface DashboardStats {
   totalInventoryValue: number;
 }
 
-export type ApiResponse<T> = {
+export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
-  message?: string;
-};
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
